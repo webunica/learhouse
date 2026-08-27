@@ -25,8 +25,10 @@ function loadRuntimeConfig(): Record<string, string> {
     // Server-side: try to read from runtime-config.json
     // Try multiple possible paths for standalone mode
     try {
-      const fs = require('fs');
-      const path = require('path');
+      const _req = typeof eval !== 'undefined' ? eval('require') : null;
+      if (_req) {
+        const fs = _req('fs');
+        const path = _req('path');
       
       // In standalone mode, runtime-config.json is in the same directory as server.js
       // Try common possible locations relative to the current working directory and module
@@ -44,6 +46,7 @@ function loadRuntimeConfig(): Record<string, string> {
           }
         } catch {
           // Continue to next path
+        }
         }
       }
     } catch {
