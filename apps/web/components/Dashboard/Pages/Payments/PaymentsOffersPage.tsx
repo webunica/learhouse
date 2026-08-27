@@ -114,7 +114,13 @@ function PaymentsOffersPage() {
         )}
 
         {(() => {
-          const offersList = Array.isArray(offers?.data) ? offers.data : Array.isArray(offers) ? offers : [];
+          const offersList = Array.isArray(offers?.data)
+            ? offers.data
+            : Array.isArray(offers?.data?.data)
+            ? offers.data.data
+            : Array.isArray(offers)
+            ? offers
+            : [];
           return (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

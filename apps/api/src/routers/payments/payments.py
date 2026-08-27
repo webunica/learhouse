@@ -112,7 +112,7 @@ async def get_offers(
         custom_offers = org_cfg.config.get("custom_offers", [])
 
     if custom_offers:
-        return {"success": True, "data": custom_offers}
+        return custom_offers
 
     # Fallback to courses if no custom offers exist yet
     courses_stmt = select(Course).where(Course.org_id == org_id)
@@ -133,7 +133,7 @@ async def get_offers(
             "archived": False,
         })
 
-    return {"success": True, "data": offers}
+    return offers
 
 
 @router.post("/{org_id}/offers")

@@ -104,14 +104,15 @@ const CreateOfferForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => 
         payments_group_id: values.payments_group_id !== '' ? values.payments_group_id : undefined,
       };
       const res = await createOffer(org.id, payload, token);
-      if (res.success) {
+      if (res.success || res.status === 200 || res.status === 201) {
         track(AnalyticsEvent.OfferCreated, {
           offer_type: values.offer_type,
           price_type: values.price_type,
           amount: values.amount,
         });
         toast.success('Offer created successfully');
-        queryClient.invalidateQueries({ queryKey: queryKeys.payments.offers(org.id) });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.payments.offers(org.id) });
+        await queryClient.refetchQueries({ queryKey: queryKeys.payments.offers(org.id) });
         resetForm();
         onSuccess();
       } else {
