@@ -66,8 +66,8 @@ fi
 export PYTHONUNBUFFERED=1
 export PYTHONIOENCODING=utf-8
 
-# Get port from config or use default
-PORT=${LEARNHOUSE_PORT:-9000}
+# Get port from environment (Railway provides PORT) or config or use default
+PORT=${PORT:-${LEARNHOUSE_PORT:-9000}}
 HOST=${HOSTNAME:-0.0.0.0}
 
 echo "Starting LearnHouse backend on ${HOST}:${PORT}..."
