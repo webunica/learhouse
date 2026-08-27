@@ -178,18 +178,19 @@ function ThumbnailUpdate({ thumbnailType }: ThumbnailUpdateProps) {
   }
 
   const getThumbnailUrl = (type: 'image' | 'video') => {
+    const orgUuid = org?.org_uuid || (typeof course?.courseStructure?.org_id === 'string' ? course.courseStructure.org_id : String(course?.courseStructure?.org_id || org?.id || '1'))
     if (type === 'image') {
-      return course.courseStructure.thumbnail_image
+      return course?.courseStructure?.thumbnail_image
         ? getCourseThumbnailMediaDirectory(
-            org?.org_uuid,
+            orgUuid,
             course.courseStructure.course_uuid,
             course.courseStructure.thumbnail_image
           )
-        : '/empty_thumbnail.png';
+        : null;
     } else {
-      return course.courseStructure.thumbnail_video
+      return course?.courseStructure?.thumbnail_video
         ? getCourseThumbnailMediaDirectory(
-            org?.org_uuid,
+            orgUuid,
             course.courseStructure.course_uuid,
             course.courseStructure.thumbnail_video
           )
