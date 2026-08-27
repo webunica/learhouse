@@ -94,16 +94,24 @@ async def create_preference(
         )
 
     # 3. Resolve Frontend & Backend URLs
-    frontend_domain = config.hosting_config.frontend_domain or "localhost:3000"
-    protocol = "https" if config.hosting_config.ssl else "http"
-    if "://" not in frontend_domain:
-        frontend_url = f"{protocol}://{frontend_domain}"
+    frontend_domain = (
+        os.environ.get("LEARNHOUSE_FRONTEND_DOMAIN")
+        or os.environ.get("NEXT_PUBLIC_LEARNHOUSE_MAIN_DOMAIN_NAME")
+        or config.hosting_config.frontend_domain
+        or "web-plum-ten-49.vercel.app"
+    )
+    if not frontend_domain.startswith("http"):
+        frontend_url = f"https://{frontend_domain}".rstrip("/")
     else:
         frontend_url = frontend_domain.rstrip("/")
 
-    backend_domain = config.hosting_config.domain or "localhost:8000"
-    if "://" not in backend_domain:
-        backend_url = f"{protocol}://{backend_domain}"
+    backend_domain = (
+        os.environ.get("LEARNHOUSE_DOMAIN")
+        or config.hosting_config.domain
+        or "learhouse-production.up.railway.app"
+    )
+    if not backend_domain.startswith("http"):
+        backend_url = f"https://{backend_domain}".rstrip("/")
     else:
         backend_url = backend_domain.rstrip("/")
 
