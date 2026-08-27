@@ -101,7 +101,7 @@ function OfferCard({ offer, orgslug, orgUuid, position }: { offer: Offer; orgslu
 
   return (
     <Link
-      href={getUriWithOrg(orgslug, `/store/offers/${offer.offer_uuid}`)}
+      href={getUriWithOrg(orgslug, `/store/offers/${offer.offer_uuid || offer.id}`)}
       onClick={() => track(AnalyticsEvent.StoreOfferCardClicked, { offer_type: offer.offer_type, amount: offer.amount, position })}
     >
       <div className="group bg-white rounded-xl nice-shadow overflow-hidden flex flex-col h-full cursor-pointer transition-all duration-200 hover:scale-[1.01]">

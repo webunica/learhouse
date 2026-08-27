@@ -118,15 +118,20 @@ export function formatNumber(
 
 export function formatCurrency(
   value: number,
-  currency: string,
+  currency?: string,
   lng?: string,
   options?: Intl.NumberFormatOptions
 ): string {
-  return new Intl.NumberFormat(intlLocale(lng), {
-    style: 'currency',
-    currency,
-    ...options,
-  }).format(value)
+  const safeCurrency = (currency || 'CLP').toUpperCase()
+  try {
+    return new Intl.NumberFormat(intlLocale(lng), {
+      style: 'currency',
+      currency: safeCurrency,
+      ...options,
+    }).format(value || 0)
+  } catch (_e) {
+    return `${safeCurrency} ${value || 0}`
+  }
 }
 
 export function formatPercent(

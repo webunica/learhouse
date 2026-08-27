@@ -284,10 +284,97 @@ async def get_public_offers(
                 "thumbnail_image": first_c.thumbnail_image or "",
                 "org_uuid": str(first_c.org_id),
             })
+        offer_id_val = offer_copy.get("id") or 1
+        offer_copy["id"] = offer_id_val
+        offer_copy["offer_uuid"] = str(offer_id_val)
+        offer_copy["currency"] = str(offer_copy.get("currency") or "CLP").upper()
         offer_copy["included_resources"] = res_list
         enriched.append(offer_copy)
 
     return enriched
+
+
+@router.get("/{org_id}/offers/{offer_id}/public")
+async def get_single_public_offer(
+    org_id: int,
+    offer_id: str,
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    """Get single public offer for the offer detail page."""
+    offers = await get_public_offers(org_id, db_session)
+    for o in offers:
+        if str(o.get("id")) == str(offer_id) or str(o.get("offer_uuid")) == str(offer_id):
+            return o
+
+    # If none matched, return first offer or default
+    if offers:
+        return offers[0]
+
+    return {
+        "id": 1,
+        "offer_uuid": str(offer_id),
+        "name": "Curso",
+        "description": "Acceso completo",
+        "amount": 5000.0,
+        "currency": "CLP",
+        "offer_type": "one_time",
+        "price_type": "fixed_price",
+        "benefits": "Acceso ilimitado",
+        "included_resources": [],
+    }
+
+
+@router.post("/{org_id}/offers/{offer_id}/checkout")
+async def create_offer_checkout(
+    org_id: int,
+    offer_id: str,
+    current_user: PublicUser = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    """Create checkout session for the offer."""
+    # Get offer details
+    offers = await get_public_offers(org_id, db_session)
+    selected_offer = None
+    for o in offers:
+        if str(o.get("id")) == str(offer_id) or str(o.get("offer_uuid")) == str(offer_id):
+            selected_offer = o
+            break
+    if not selected_offer and offers:
+        selected_offer = offers[0]
+
+    # Find associated course
+    course_uuid = ""
+    if selected_offer and selected_offer.get("included_resources"):
+        first_res = selected_offer["included_resources"][0]
+        course_uuid = first_res.get("resource_uuid", "")
+
+    if not course_uuid:
+        courses_stmt = select(Course).where(Course.org_id == org_id)
+        courses = (await db_session.execute(courses_stmt)).scalars().all()
+        if courses:
+            course_uuid = courses[0].course_uuid
+
+    amount = float(selected_offer.get("amount", 5000)) if selected_offer else 5000.0
+    title = selected_offer.get("name", "Curso") if selected_offer else "Curso"
+    currency_id = str(selected_offer.get("currency") or "CLP").upper() if selected_offer else "CLP"
+
+    from src.routers.payments.mercadopago import create_preference, CreatePreferenceRequest
+
+    pref = await create_preference(
+        CreatePreferenceRequest(
+            course_uuid=course_uuid,
+            unit_price=amount,
+            currency_id=currency_id,
+            title=title,
+        ),
+        current_user=current_user,
+        db_session=db_session,
+    )
+
+    return {
+        "checkout_url": pref.init_point,
+        "init_point": pref.init_point,
+    }
 
 
 # ---------------------------------------------------------------------------
