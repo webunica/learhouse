@@ -152,14 +152,14 @@ export default function OfferDetailClient({ orgslug, orgId, offerUuid, offer, ac
     setLoading(true)
     try {
       const redirectUri = window.location.href
-      const result = await getOfferCheckoutSession(orgId, offerUuid, redirectUri, token)
-      const url = result?.data?.checkout_url || result?.data?.init_point || result?.checkout_url || result?.init_point
+      const res = (await getOfferCheckoutSession(orgId, offerUuid, redirectUri, token)) as any
+      const url = res?.data?.checkout_url || res?.data?.init_point || res?.checkout_url || res?.init_point
       if (url) {
         track(AnalyticsEvent.CheckoutSessionCreated, { offer_type: offer.offer_type, amount: offer.amount })
         window.location.href = url
       } else {
         track(AnalyticsEvent.CheckoutSessionFailed, { failure_reason: 'no_checkout_url' })
-        const errorDetail = result?.data?.detail || result?.detail || 'MercadoPago no está configurado o requiere MERCADOPAGO_ACCESS_TOKEN en Railway.'
+        const errorDetail = res?.data?.detail || res?.detail || 'MercadoPago no está configurado o requiere MERCADOPAGO_ACCESS_TOKEN en Railway.'
         toast.error(errorDetail)
       }
     } catch (err) {
