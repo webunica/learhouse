@@ -142,12 +142,12 @@ function OverviewTab({ orgId, accessToken }: { orgId: number; accessToken: strin
     <div className="space-y-6">
       {/* Metric cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-        <MetricCard label="MRR"               value={fmt(d.mrr)}            icon={TrendingUp}  color="bg-blue-100 text-blue-600" />
-        <MetricCard label="ARR"               value={fmt(d.arr)}            icon={TrendingUp}  color="bg-indigo-100 text-indigo-600" />
-        <MetricCard label="Total revenue"     value={fmt(d.total_revenue)}  icon={DollarSign}  color="bg-green-100 text-green-600" />
-        <MetricCard label="Active subscribers" value={String(d.active_subscribers)} icon={RefreshCcw} color="bg-violet-100 text-violet-600" />
-        <MetricCard label="Total customers"   value={String(d.total_customers)} icon={Users}   color="bg-purple-100 text-purple-600" />
-        <MetricCard label="Churned (30d)"     value={String(d.churn_30d)}   icon={Activity}    color="bg-red-100 text-red-500" />
+        <MetricCard label="MRR"               value={fmt(d?.mrr || 0)}            icon={TrendingUp}  color="bg-blue-100 text-blue-600" />
+        <MetricCard label="ARR"               value={fmt(d?.arr || 0)}            icon={TrendingUp}  color="bg-indigo-100 text-indigo-600" />
+        <MetricCard label="Total revenue"     value={fmt(d?.total_revenue || 0)}  icon={DollarSign}  color="bg-green-100 text-green-600" />
+        <MetricCard label="Active subscribers" value={String(d?.active_subscribers || 0)} icon={RefreshCcw} color="bg-violet-100 text-violet-600" />
+        <MetricCard label="Total customers"   value={String(d?.total_customers || 0)} icon={Users}   color="bg-purple-100 text-purple-600" />
+        <MetricCard label="Churned (30d)"     value={String(d?.churn_30d || 0)}   icon={Activity}    color="bg-red-100 text-red-500" />
       </div>
 
       {/* Recent charges */}
@@ -155,11 +155,11 @@ function OverviewTab({ orgId, accessToken }: { orgId: number; accessToken: strin
         <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
           <span className="font-semibold text-gray-800 text-sm">Recent transactions</span>
         </div>
-        {d.recent_charges.length === 0 ? (
+        {(!d?.recent_charges || d.recent_charges.length === 0) ? (
           <div className="px-5 py-8 text-center text-sm text-gray-400">No transactions yet</div>
         ) : (
           <div className="divide-y divide-gray-50">
-            {d.recent_charges.map((ch: any) => (
+            {(d?.recent_charges || []).map((ch: any) => (
               <div key={ch.id} className="px-5 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
                 <div className="flex items-center space-x-3">
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center ${ch.paid ? 'bg-green-100' : 'bg-red-100'}`}>

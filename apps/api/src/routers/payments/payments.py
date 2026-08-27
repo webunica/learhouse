@@ -79,6 +79,8 @@ async def delete_payment_config(
     return {"status": "deleted"}
 
 
+from src.db.organization_config import OrganizationConfig
+
 # ---------------------------------------------------------------------------
 # Offers
 # ---------------------------------------------------------------------------
@@ -102,7 +104,17 @@ async def get_offers(
     db_session: AsyncSession = Depends(get_db_session),
 ):
     """Returns all offers for the organization."""
-    # We can list courses as standard purchasable offers
+    cfg_stmt = select(OrganizationConfig).where(OrganizationConfig.org_id == org_id)
+    org_cfg = (await db_session.execute(cfg_stmt)).scalars().first()
+
+    custom_offers = []
+    if org_cfg and isinstance(org_cfg.config, dict):
+        custom_offers = org_cfg.config.get("custom_offers", [])
+
+    if custom_offers:
+        return {"success": True, "data": custom_offers}
+
+    # Fallback to courses if no custom offers exist yet
     courses_stmt = select(Course).where(Course.org_id == org_id)
     courses = (await db_session.execute(courses_stmt)).scalars().all()
 
@@ -129,13 +141,17 @@ async def create_offer(
     org_id: int,
     body: CreateOfferSchema,
     current_user: PublicUser = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
 ):
-    """Create a new offer."""
+    """Create a new offer and persist it in org config."""
+    cfg_stmt = select(OrganizationConfig).where(OrganizationConfig.org_id == org_id)
+    org_cfg = (await db_session.execute(cfg_stmt)).scalars().first()
+
     new_offer = {
-        "id": int(datetime.now().timestamp()),
+        "id": int(datetime.now().timestamp() * 1000),
         "name": body.name,
         "description": body.description,
-        "amount": body.amount,
+        "amount": float(body.amount),
         "currency": body.currency,
         "offer_type": body.offer_type,
         "price_type": body.price_type,
@@ -143,6 +159,16 @@ async def create_offer(
         "resource_uuids": body.resource_uuids or [],
         "archived": False,
     }
+
+    if org_cfg:
+        new_config = dict(org_cfg.config) if isinstance(org_cfg.config, dict) else {}
+        existing_offers = list(new_config.get("custom_offers", []))
+        existing_offers.append(new_offer)
+        new_config["custom_offers"] = existing_offers
+        org_cfg.config = new_config
+        db_session.add(org_cfg)
+        await db_session.commit()
+
     return {"success": True, "data": new_offer}
 
 
@@ -152,8 +178,28 @@ async def update_offer(
     offer_id: str,
     body: dict,
     current_user: PublicUser = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
 ):
     """Update an existing offer."""
+    cfg_stmt = select(OrganizationConfig).where(OrganizationConfig.org_id == org_id)
+    org_cfg = (await db_session.execute(cfg_stmt)).scalars().first()
+
+    if org_cfg and isinstance(org_cfg.config, dict):
+        new_config = dict(org_cfg.config)
+        existing_offers = list(new_config.get("custom_offers", []))
+        updated_offers = []
+        for o in existing_offers:
+            if str(o.get("id")) == str(offer_id):
+                updated = dict(o)
+                updated.update(body)
+                updated_offers.append(updated)
+            else:
+                updated_offers.append(o)
+        new_config["custom_offers"] = updated_offers
+        org_cfg.config = new_config
+        db_session.add(org_cfg)
+        await db_session.commit()
+
     return {"success": True, "data": body}
 
 
@@ -162,8 +208,20 @@ async def archive_offer(
     org_id: int,
     offer_id: str,
     current_user: PublicUser = Depends(get_current_user),
+    db_session: AsyncSession = Depends(get_db_session),
 ):
     """Archive an offer."""
+    cfg_stmt = select(OrganizationConfig).where(OrganizationConfig.org_id == org_id)
+    org_cfg = (await db_session.execute(cfg_stmt)).scalars().first()
+
+    if org_cfg and isinstance(org_cfg.config, dict):
+        new_config = dict(org_cfg.config)
+        existing_offers = list(new_config.get("custom_offers", []))
+        new_config["custom_offers"] = [o for o in existing_offers if str(o.get("id")) != str(offer_id)]
+        org_cfg.config = new_config
+        db_session.add(org_cfg)
+        await db_session.commit()
+
     return {"success": True, "status": 200}
 
 
@@ -173,6 +231,16 @@ async def get_public_offers(
     db_session: AsyncSession = Depends(get_db_session),
 ):
     """Public listing of offers for the store."""
+    cfg_stmt = select(OrganizationConfig).where(OrganizationConfig.org_id == org_id)
+    org_cfg = (await db_session.execute(cfg_stmt)).scalars().first()
+
+    custom_offers = []
+    if org_cfg and isinstance(org_cfg.config, dict):
+        custom_offers = org_cfg.config.get("custom_offers", [])
+
+    if custom_offers:
+        return {"success": True, "data": custom_offers}
+
     courses_stmt = select(Course).where(Course.org_id == org_id)
     courses = (await db_session.execute(courses_stmt)).scalars().all()
 
@@ -251,11 +319,17 @@ async def get_stripe_overview(
     org_id: int,
     current_user: PublicUser = Depends(get_current_user),
 ):
-    """Stripe overview placeholder."""
+    """Stripe / Payment overview."""
     return {
+        "mrr": 0,
+        "arr": 0,
+        "total_revenue": 0,
+        "active_subscribers": 0,
+        "total_customers": 0,
+        "churn_30d": 0,
+        "recent_charges": [],
         "charges": [],
         "balance": 0,
         "currency": "CLP",
-        "total_revenue": 0,
-        "active_subscriptions": 0,
     }
+
