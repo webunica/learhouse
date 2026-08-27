@@ -68,14 +68,6 @@ function PaymentsPage(props: { params: Promise<PaymentsParams> }) {
     'dashboard',
   )
 
-  // Gate 1: OSS deployment → payments is EE-only, blocked entirely
-  if (isOSSMode()) {
-    return (
-      <FeatureGate feature="payments">
-        <></>
-      </FeatureGate>
-    )
-  }
 
   const tabs: DashTabItem[] = [
     {
