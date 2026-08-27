@@ -38,6 +38,7 @@ async def get_payment_configs(
         {
             "id": 1,
             "provider": "mercadopago",
+            "provider_specific_id": "mercadopago_app" if mp_token else None,
             "active": bool(mp_token),
             "details": {
                 "name": "MercadoPago",
@@ -47,6 +48,7 @@ async def get_payment_configs(
         {
             "id": 2,
             "provider": "stripe",
+            "provider_specific_id": "stripe_app" if stripe_key else None,
             "active": bool(stripe_key),
             "details": {
                 "name": "Stripe",
