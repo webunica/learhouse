@@ -156,6 +156,7 @@ const ProviderCard: React.FC<ProviderCardProps> = ({ provider, config, orgId, ac
   const queryClient = useQueryClient();
   const { track } = useLHAnalytics('dashboard');
   const [isConnecting, setIsConnecting] = useState(false);
+  const [disconnectError, setDisconnectError] = useState<{ count: number } | null>(null);
   const isConnected = !!(config?.active || (config?.provider_specific_id && config?.active));
 
   const handleConnect = async () => {
