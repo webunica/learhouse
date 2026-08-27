@@ -234,32 +234,60 @@ async def get_public_offers(
     cfg_stmt = select(OrganizationConfig).where(OrganizationConfig.org_id == org_id)
     org_cfg = (await db_session.execute(cfg_stmt)).scalars().first()
 
+    courses_stmt = select(Course).where(Course.org_id == org_id)
+    courses = (await db_session.execute(courses_stmt)).scalars().all()
+    courses_by_uuid = {c.course_uuid: c for c in courses}
+
     custom_offers = []
     if org_cfg and isinstance(org_cfg.config, dict):
         custom_offers = org_cfg.config.get("custom_offers", [])
 
-    if custom_offers:
-        return {"success": True, "data": custom_offers}
+    if not custom_offers:
+        for c in courses:
+            custom_offers.append({
+                "id": c.id,
+                "name": c.name,
+                "description": c.description or f"Acceso completo a {c.name}",
+                "amount": 10000.0,
+                "currency": "CLP",
+                "offer_type": "one_time",
+                "price_type": "fixed_price",
+                "benefits": "Acceso ilimitado",
+                "resource_uuids": [c.course_uuid],
+            })
 
-    courses_stmt = select(Course).where(Course.org_id == org_id)
-    courses = (await db_session.execute(courses_stmt)).scalars().all()
+    # Enrich each offer with included_resources
+    enriched = []
+    for o in custom_offers:
+        offer_copy = dict(o)
+        res_list = []
+        uuids = offer_copy.get("resource_uuids", [])
+        for u in uuids:
+            course = courses_by_uuid.get(u)
+            if course:
+                res_list.append({
+                    "resource_uuid": course.course_uuid,
+                    "resource_type": "course",
+                    "name": course.name,
+                    "description": course.description or "",
+                    "thumbnail_image": course.thumbnail_image or "",
+                    "org_uuid": str(course.org_id),
+                })
+        if not res_list and courses:
+            # Fallback to first course if none explicitly matched
+            first_c = courses[0]
+            res_list.append({
+                "resource_uuid": first_c.course_uuid,
+                "resource_type": "course",
+                "name": first_c.name,
+                "description": first_c.description or "",
+                "thumbnail_image": first_c.thumbnail_image or "",
+                "org_uuid": str(first_c.org_id),
+            })
+        offer_copy["included_resources"] = res_list
+        enriched.append(offer_copy)
 
-    offers = []
-    for c in courses:
-        offers.append({
-            "id": c.id,
-            "offer_id": c.id,
-            "name": c.name,
-            "offer_name": c.name,
-            "description": c.description or f"Acceso completo a {c.name}",
-            "amount": 10000.0,
-            "currency": "CLP",
-            "offer_type": "one_time",
-            "price_type": "fixed_price",
-            "resource_uuids": [c.course_uuid],
-        })
-
-    return {"success": True, "data": offers}
+    return enriched
 
 
 # ---------------------------------------------------------------------------
