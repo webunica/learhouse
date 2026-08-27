@@ -44,17 +44,17 @@ if [ -n "$LEARNHOUSE_SQL_CONNECTION_STRING" ]; then
 fi
 
 if [ -n "$LEARNHOUSE_REDIS_CONNECTION_STRING" ]; then
-    # Extract host and port from redis://host:port/db or redis://host:port
-    REDIS_HOST=$(echo "$LEARNHOUSE_REDIS_CONNECTION_STRING" | sed -n 's|redis://\([^:/]*\):\([0-9]*\).*|\1|p')
-    REDIS_PORT=$(echo "$LEARNHOUSE_REDIS_CONNECTION_STRING" | sed -n 's|redis://\([^:/]*\):\([0-9]*\).*|\2|p')
+    # Extract host and port from redis://user:pass@host:port or redis://host:port
+    if echo "$LEARNHOUSE_REDIS_CONNECTION_STRING" | grep -q "@"; then
+        REDIS_HOST=$(echo "$LEARNHOUSE_REDIS_CONNECTION_STRING" | sed -n 's/.*@\([^:]*\):\([0-9]*\).*/\1/p')
+        REDIS_PORT=$(echo "$LEARNHOUSE_REDIS_CONNECTION_STRING" | sed -n 's/.*@\([^:]*\):\([0-9]*\).*/\2/p')
+    else
+        REDIS_HOST=$(echo "$LEARNHOUSE_REDIS_CONNECTION_STRING" | sed -n 's|redis[s]*://\([^:/]*\):\([0-9]*\).*|\1|p')
+        REDIS_PORT=$(echo "$LEARNHOUSE_REDIS_CONNECTION_STRING" | sed -n 's|redis[s]*://\([^:/]*\):\([0-9]*\).*|\2|p')
+    fi
     
     if [ -z "$REDIS_PORT" ]; then
         REDIS_PORT=6379
-    fi
-    
-    if [ -z "$REDIS_HOST" ]; then
-        # Try default format redis://host:port
-        REDIS_HOST=$(echo "$LEARNHOUSE_REDIS_CONNECTION_STRING" | sed -n 's|redis://\([^:/]*\).*|\1|p')
     fi
     
     if [ -n "$REDIS_HOST" ]; then
