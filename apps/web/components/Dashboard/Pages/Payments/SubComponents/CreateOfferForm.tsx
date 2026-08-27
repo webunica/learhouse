@@ -51,10 +51,20 @@ const CreateOfferForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => 
   const [currencies, setCurrencies] = useState<{ code: string; name: string }[]>([]);
 
   useEffect(() => {
-    const allCurrencies = currencyCodes.data.map((c) => ({
-      code: c.code,
-      name: `${c.code} - ${c.currency}`,
-    }));
+    const list = (currencyCodes as any)?.data || (currencyCodes as any)?.default?.data || [];
+    const allCurrencies = Array.isArray(list) && list.length > 0
+      ? list.map((c: any) => ({
+          code: c.code,
+          name: `${c.code} - ${c.currency || c.name || c.code}`,
+        }))
+      : [
+          { code: 'CLP', name: 'CLP - Chilean Peso' },
+          { code: 'USD', name: 'USD - US Dollar' },
+          { code: 'EUR', name: 'EUR - Euro' },
+          { code: 'ARS', name: 'ARS - Argentine Peso' },
+          { code: 'MXN', name: 'MXN - Mexican Peso' },
+          { code: 'COP', name: 'COP - Colombian Peso' },
+        ];
     setCurrencies(allCurrencies);
   }, []);
 
