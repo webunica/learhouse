@@ -24,6 +24,7 @@ from src.routers.orgs import custom_domains
 from src.routers.orgs import packs
 from src.routers.orgs import org_plan
 from src.routers.payments import mercadopago as mercadopago_router
+from src.routers.payments import payments as generic_payments_router
 from src.routers.courses import chapters, courses, assignments, certifications
 from src.routers.folders import folders as folders_router_module
 from src.routers.media import media as media_router_module
@@ -426,5 +427,11 @@ v1_router.include_router(
 # MercadoPago Payments Routes
 v1_router.include_router(
     mercadopago_router.router,
+    dependencies=[Depends(get_non_api_token_user)],
+)
+
+# Generic Payments Routes
+v1_router.include_router(
+    generic_payments_router.router,
     dependencies=[Depends(get_non_api_token_user)],
 )
