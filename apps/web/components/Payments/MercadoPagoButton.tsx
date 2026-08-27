@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@components/ui/button';
 import { Loader2, CreditCard } from 'lucide-react';
 import { createMercadoPagoPreference } from '@services/payments/mercadopago';
-import { useUser } from '@components/Contexts/UserContext';
+import { useAuth } from '@components/Contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 interface MercadoPagoButtonProps {
@@ -27,11 +27,12 @@ export function MercadoPagoButton({
 }: MercadoPagoButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const user = useUser() as any;
+  const { session, accessToken } = useAuth();
+  const user = session?.user;
   const router = useRouter();
 
   const handlePayment = async () => {
-    if (!user || !user.id) {
+    if (!user) {
       router.push('/login');
       return;
     }
@@ -45,7 +46,7 @@ export function MercadoPagoButton({
         price,
         currency,
         title,
-        user.access_token || undefined
+        accessToken || undefined
       );
 
       if (pref && pref.init_point) {
