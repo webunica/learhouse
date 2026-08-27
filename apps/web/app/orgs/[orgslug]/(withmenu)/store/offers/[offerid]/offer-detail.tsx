@@ -177,7 +177,7 @@ export default function OfferDetailClient({ orgslug, orgId, offerUuid, offer, ac
           href={getUriWithOrg(orgslug, '/store')}
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors mb-7"
         >
-          <ArrowLeft size={14} /> Back to store
+          <ArrowLeft size={14} /> Volver a la tienda
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -188,11 +188,11 @@ export default function OfferDetailClient({ orgslug, orgId, offerUuid, offer, ac
               <div className="flex items-center gap-2 mb-2.5">
                 {isSubscription ? (
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-100 rounded-full px-3 py-1">
-                    <RefreshCcw size={11} /> Subscription
+                    <RefreshCcw size={11} /> Suscripción
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full px-3 py-1">
-                    <SquareCheck size={11} /> One-time payment
+                    <SquareCheck size={11} /> Pago único
                   </span>
                 )}
               </div>
@@ -204,7 +204,7 @@ export default function OfferDetailClient({ orgslug, orgId, offerUuid, offer, ac
             {resources.length > 0 && (
               <div>
                 <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-4">
-                  What&apos;s included · {resources.length} {resources.length === 1 ? 'resource' : 'resources'}
+                  Qué incluye · {resources.length} {resources.length === 1 ? 'curso' : 'cursos'}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {resources.map((r) => (
@@ -217,7 +217,7 @@ export default function OfferDetailClient({ orgslug, orgId, offerUuid, offer, ac
             {/* Benefits */}
             {benefits.length > 0 && (
               <div className="bg-white rounded-xl nice-shadow p-5">
-                <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Benefits</h2>
+                <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Beneficios incluidos</h2>
                 <ul className="space-y-2.5">
                   {benefits.map((b, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-sm text-gray-700">
@@ -236,13 +236,13 @@ export default function OfferDetailClient({ orgslug, orgId, offerUuid, offer, ac
               {/* Price */}
               <div className="mb-5">
                 <p className="text-xs text-gray-400 font-medium mb-1">
-                  {offer.price_type === 'customer_choice' ? 'Pay what you want (min.)' : isSubscription ? 'Subscription price' : 'One-time price'}
+                  {offer.price_type === 'customer_choice' ? 'Precio flexible (mín.)' : isSubscription ? 'Precio de suscripción' : 'Precio de compra'}
                 </p>
                 <div className={`text-4xl font-black ${isSubscription ? 'text-indigo-700' : 'text-gray-900'}`}>
-                  {formatCurrency(offer.amount, offer.currency, i18n.language)}
+                  {formatCurrency(offer.amount, offer.currency, 'es-CL')}
                 </div>
                 {isSubscription && (
-                  <p className="text-sm text-indigo-400 font-medium mt-0.5">recurring</p>
+                  <p className="text-sm text-indigo-400 font-medium mt-0.5">recurrente</p>
                 )}
               </div>
 
@@ -257,22 +257,22 @@ export default function OfferDetailClient({ orgslug, orgId, offerUuid, offer, ac
                 }`}
               >
                 {loading ? (
-                  <><Loader2 size={15} className="animate-spin" /> Processing…</>
+                  <><Loader2 size={15} className="animate-spin" /> Conectando con MercadoPago…</>
                 ) : (
-                  <>{isSubscription ? 'Subscribe now' : 'Get access'}</>
+                  <>{isSubscription ? 'Suscribirme ahora' : 'Comprar acceso ahora'}</>
                 )}
               </button>
 
               {!token && (
                 <p className="text-xs text-center text-gray-400 mt-3">
-                  You&apos;ll be asked to sign in before checkout.
+                  Inicia sesión para asociar el curso a tu cuenta.
                 </p>
               )}
 
               {/* Resource summary */}
               {resources.length > 0 && (
                 <div className="mt-5 pt-4 border-t border-gray-100">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Included</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Incluye acceso a</p>
                   <div className="space-y-2">
                     {resources.map((r) => {
                       const src = r.thumbnail_image && r.resource_type === 'course'
@@ -300,9 +300,9 @@ export default function OfferDetailClient({ orgslug, orgId, offerUuid, offer, ac
 
               {/* Trust signals */}
               <div className="mt-5 pt-4 border-t border-gray-100 space-y-1.5">
-                <p className="text-xs text-gray-400 flex items-center gap-1.5"><ShoppingBag size={11} /> Secure checkout via Stripe</p>
-                {isSubscription && <p className="text-xs text-gray-400">✓ Cancel anytime</p>}
-                <p className="text-xs text-gray-400">✓ Instant access after payment</p>
+                <p className="text-xs text-gray-500 flex items-center gap-1.5 font-medium"><ShoppingBag size={13} className="text-blue-500" /> Pago seguro con MercadoPago / Webpay</p>
+                {isSubscription && <p className="text-xs text-gray-400">✓ Cancela en cualquier momento</p>}
+                <p className="text-xs text-gray-400">✓ Acceso instantáneo tras el pago</p>
               </div>
             </div>
           </div>

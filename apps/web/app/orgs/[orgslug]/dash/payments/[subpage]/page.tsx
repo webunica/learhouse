@@ -31,28 +31,28 @@ function PaymentsPage(props: { params: Promise<PaymentsParams> }) {
     switch (subpage) {
       case 'overview':
         return {
-          h1: 'Overview',
-          h2: 'Revenue, transactions, subscriptions and customers'
+          h1: 'Resumen de Pagos',
+          h2: 'Ingresos, transacciones, clientes y compras'
         }
       case 'offers':
         return {
-          h1: 'Offers',
-          h2: 'Manage your offers and subscriptions'
+          h1: 'Ofertas y Precios',
+          h2: 'Administra los precios de tus cursos y suscripciones'
         }
       case 'groups':
         return {
-          h1: 'Payment Groups',
-          h2: 'Bundle resources for subscriptions and multi-course offers'
+          h1: 'Grupos de Pago',
+          h2: 'Crea paquetes y ofertas con múltiples cursos incluidos'
         }
       case 'configuration':
         return {
-          h1: 'Payment Configuration',
-          h2: 'Set up and manage your payment gateway'
+          h1: 'Configuración de Pasarela',
+          h2: 'Conecta y gestiona MercadoPago y métodos de pago'
         }
       default:
         return {
-          h1: 'Payments',
-          h2: 'Overview of your payment settings and transactions'
+          h1: 'Pagos',
+          h2: 'Administración de cobros y transacciones'
         }
     }
   }
@@ -72,28 +72,28 @@ function PaymentsPage(props: { params: Promise<PaymentsParams> }) {
   const tabs: DashTabItem[] = [
     {
       key: 'overview',
-      label: 'Overview',
+      label: 'Resumen',
       icon: <Users size={16} />,
       href: getUriWithOrg(params.orgslug, '/dash/payments/overview'),
       active: subpage === 'overview',
     },
     {
       key: 'offers',
-      label: 'Offers',
+      label: 'Ofertas',
       icon: <Gem size={16} />,
       href: getUriWithOrg(params.orgslug, '/dash/payments/offers'),
       active: subpage === 'offers',
     },
     {
       key: 'groups',
-      label: 'Payment Groups',
+      label: 'Grupos de Pago',
       icon: <Layers size={16} />,
       href: getUriWithOrg(params.orgslug, '/dash/payments/groups'),
       active: subpage === 'groups',
     },
     {
       key: 'configuration',
-      label: 'Configuration',
+      label: 'Configuración',
       icon: <Settings size={16} />,
       href: getUriWithOrg(params.orgslug, '/dash/payments/configuration'),
       active: subpage === 'configuration',
@@ -107,7 +107,7 @@ function PaymentsPage(props: { params: Promise<PaymentsParams> }) {
       <div className="ps-4 pe-4 sm:ps-10 sm:pe-10 tracking-tight bg-[#fcfbfc] z-10 nice-shadow flex-shrink-0 relative">
         <div className="pt-6 pb-4">
           <Breadcrumbs items={[
-            { label: 'Payments', href: '/dash/payments', icon: <CreditCard size={14} /> }
+            { label: 'Pagos', href: '/dash/payments', icon: <CreditCard size={14} /> }
           ]} />
         </div>
         <div className="my-2 py-2 flex flex-wrap gap-2 items-end justify-between">
@@ -127,18 +127,17 @@ function PaymentsPage(props: { params: Promise<PaymentsParams> }) {
                 className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <ShoppingBag size={14} />
-                <span>Preview Shop</span>
+                <span>Ver Tienda</span>
                 <ExternalLink size={12} className="text-gray-400" />
               </Link>
             )}
             <a
-              href="https://dashboard.stripe.com"
+              href="https://www.mercadopago.cl/developers/panel/app"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              <SiStripe size={14} className="text-[#635BFF]" />
-              <span>Stripe Dashboard</span>
+              <span>Panel MercadoPago</span>
               <ExternalLink size={12} className="text-gray-400" />
             </a>
           </div>

@@ -93,8 +93,8 @@ function PaymentsOffersPage() {
         <Modal
           isDialogOpen={isCreateModalOpen}
           onOpenChange={setIsCreateModalOpen}
-          dialogTitle="Create New Offer"
-          dialogDescription="Add a new offer linked to a UserGroup"
+          dialogTitle="Crear Nueva Oferta"
+          dialogDescription="Define el precio y selecciona los cursos incluidos"
           dialogContent={<CreateOfferForm onSuccess={() => setIsCreateModalOpen(false)} />}
         />
 
@@ -102,8 +102,8 @@ function PaymentsOffersPage() {
           <Modal
             isDialogOpen={!!resourcesPanelOffer}
             onOpenChange={(open) => { if (!open) setResourcesPanelOffer(null); }}
-            dialogTitle={`Resources — ${resourcesPanelOffer.name}`}
-            dialogDescription="Resources accessible to enrolled users"
+            dialogTitle={`Cursos incluidos — ${resourcesPanelOffer.name}`}
+            dialogDescription="Recursos a los que el alumno tendrá acceso tras pagar"
             dialogContent={
               <OfferResourcesPanel
                 offerId={resourcesPanelOffer.id}
@@ -139,7 +139,7 @@ function PaymentsOffersPage() {
                       <Badge className="w-fit flex items-center space-x-2" variant="outline">
                         {offer.offer_type === 'subscription' ? <RefreshCcw size={12} /> : <SquareCheck size={12} />}
                         <span className="text-sm">
-                          {offer.offer_type === 'subscription' ? 'Subscription' : 'One-time payment'}
+                          {offer.offer_type === 'subscription' ? 'Suscripción' : 'Pago único'}
                         </span>
                       </Badge>
                       <h3 className="font-bold text-lg">{offer.name}</h3>
@@ -148,15 +148,16 @@ function PaymentsOffersPage() {
                       <button
                         onClick={() => setEditingOfferId(String(offer.id))}
                         className="text-blue-500 hover:text-blue-700"
+                        title="Editar oferta"
                       >
                         <Pencil size={16} />
                       </button>
                       <ConfirmationModal
-                        confirmationButtonText="Archive Offer"
-                        confirmationMessage="Are you sure you want to archive this offer?"
-                        dialogTitle={`Archive ${offer.name}?`}
+                        confirmationButtonText="Archivar Oferta"
+                        confirmationMessage="¿Estás seguro de que deseas archivar esta oferta?"
+                        dialogTitle={`¿Archivar ${offer.name}?`}
                         dialogTrigger={
-                          <button className="text-red-500 hover:text-red-700">
+                          <button className="text-red-500 hover:text-red-700" title="Archivar oferta">
                             <Archive size={16} />
                           </button>
                         }
@@ -175,7 +176,7 @@ function PaymentsOffersPage() {
                       <p className="text-gray-600">{offer.description}</p>
                       {offer.benefits && (
                         <div className="mt-2">
-                          <h4 className="font-semibold text-sm">Benefits:</h4>
+                          <h4 className="font-semibold text-sm">Beneficios:</h4>
                           <p className="text-sm text-gray-600">{offer.benefits}</p>
                         </div>
                       )}
@@ -188,9 +189,9 @@ function PaymentsOffersPage() {
                       className="text-slate-500 hover:text-slate-700 text-sm flex items-center"
                     >
                       {expandedOffers[offer.id] ? (
-                        <><ChevronUp size={16} /><span>Show less</span></>
+                        <><ChevronUp size={16} /><span className="ms-1">Ver menos</span></>
                       ) : (
-                        <><ChevronDown size={16} /><span>Show more</span></>
+                        <><ChevronDown size={16} /><span className="ms-1">Ver más</span></>
                       )}
                     </button>
                   </div>
@@ -198,26 +199,26 @@ function PaymentsOffersPage() {
                   {offer.payments_group_id && (
                     <div className="mt-1.5 flex items-center gap-1.5 text-xs text-violet-600">
                       <Layers size={12} />
-                      <span>Payment Group #{offer.payments_group_id}</span>
+                      <span>Grupo #{offer.payments_group_id}</span>
                     </div>
                   )}
 
                   <div className="mt-2">
                     <button
                       onClick={() => setResourcesPanelOffer(offer)}
-                      className="text-sm flex items-center space-x-1 text-indigo-600 hover:text-indigo-800"
+                      className="text-sm flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 font-medium"
                     >
                       <Users size={14} />
-                      <span>Manage Resources</span>
+                      <span>Cursos incluidos</span>
                     </button>
                   </div>
 
                   <div className="mt-2 flex items-center justify-between bg-gray-100 rounded-md p-2">
-                    <span className="text-sm text-gray-600">Price:</span>
-                    <span className="font-semibold text-lg">
-                      {new Intl.NumberFormat('en-US', {
+                    <span className="text-sm text-gray-600 font-medium">Precio:</span>
+                    <span className="font-bold text-lg text-gray-900">
+                      {new Intl.NumberFormat('es-CL', {
                         style: 'currency',
-                        currency: offer.currency,
+                        currency: offer.currency || 'CLP',
                       }).format(offer.amount)}
                     </span>
                   </div>
@@ -230,7 +231,7 @@ function PaymentsOffersPage() {
               {offersList.length === 0 && (
                 <div className="flex mx-auto space-x-2 font-semibold mt-3 text-gray-600 items-center">
                   <Info size={20} />
-                  <p>No offers available. Create a new offer to get started.</p>
+                  <p>No hay ofertas creadas aún. Crea tu primera oferta para empezar.</p>
                 </div>
               )}
             </>
@@ -240,10 +241,10 @@ function PaymentsOffersPage() {
         <div className="flex justify-center items-center py-10">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="mb-4 flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-linear-to-bl text-white font-medium from-gray-700 to-gray-900 border border-gray-600 shadow-gray-900/20 nice-shadow transition duration-300 hover:from-gray-600 hover:to-gray-800"
+            className="mb-4 flex items-center space-x-2 px-4 py-2 rounded-lg bg-linear-to-bl text-white font-medium from-gray-700 to-gray-900 border border-gray-600 shadow-gray-900/20 nice-shadow transition duration-300 hover:from-gray-600 hover:to-gray-800"
           >
             <Plus size={18} />
-            <span className="text-sm font-bold">Create New Offer</span>
+            <span className="text-sm font-bold">Crear Nueva Oferta</span>
           </button>
         </div>
       </div>

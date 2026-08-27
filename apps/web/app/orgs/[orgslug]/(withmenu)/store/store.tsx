@@ -122,11 +122,11 @@ function OfferCard({ offer, orgslug, orgUuid, position }: { offer: Offer; orgslu
           <div className="absolute top-2.5 start-2.5">
             {isSubscription ? (
               <span className="inline-flex items-center gap-1 text-xs font-semibold text-white bg-indigo-600/90 backdrop-blur-sm rounded-full px-2.5 py-0.5">
-                <RefreshCcw size={10} /> Subscription
+                <RefreshCcw size={10} /> Suscripción
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-700 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-0.5">
-                <SquareCheck size={10} /> One-time
+                <SquareCheck size={10} /> Pago único
               </span>
             )}
           </div>
@@ -166,7 +166,7 @@ function OfferCard({ offer, orgslug, orgUuid, position }: { offer: Offer; orgslu
                 )
               })}
               {resources.length > 2 && (
-                <p className="text-xs text-gray-400">+{resources.length - 2} more included</p>
+                <p className="text-xs text-gray-400">+{resources.length - 2} más incluidos</p>
               )}
             </div>
           )}
@@ -186,13 +186,13 @@ function OfferCard({ offer, orgslug, orgUuid, position }: { offer: Offer; orgslu
           <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
             <div>
               <div className={`text-xl font-black ${isSubscription ? 'text-indigo-700' : 'text-gray-900'}`}>
-                {formatCurrency(offer.amount, offer.currency, i18n.language)}
+                {formatCurrency(offer.amount, offer.currency, 'es-CL')}
               </div>
               {offer.price_type === 'customer_choice' && (
-                <p className="text-xs text-gray-400 leading-none">min.</p>
+                <p className="text-xs text-gray-400 leading-none">mín.</p>
               )}
               {isSubscription && (
-                <p className="text-xs text-indigo-400 leading-none font-medium">recurring</p>
+                <p className="text-xs text-indigo-400 leading-none font-medium">recurrente</p>
               )}
             </div>
             <div className={`flex items-center gap-1.5 text-sm font-semibold px-3.5 py-2 rounded-xl transition-colors ${
@@ -200,7 +200,7 @@ function OfferCard({ offer, orgslug, orgUuid, position }: { offer: Offer; orgslu
                 ? 'bg-indigo-600 text-white group-hover:bg-indigo-700'
                 : 'bg-gray-900 text-white group-hover:bg-gray-800'
             }`}>
-              {isSubscription ? 'Subscribe' : 'Get access'}
+              {isSubscription ? 'Suscribirme' : 'Comprar acceso'}
               <ArrowRight size={13} />
             </div>
           </div>
@@ -223,9 +223,9 @@ function Store({ orgslug, offers }: StoreProps) {
             <ShoppingBag size={18} className="text-gray-800" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Store</h1>
+            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Tienda de Cursos</h1>
             {org?.name && (
-              <p className="text-sm text-gray-400 mt-0.5">Unlock premium content from {org.name}</p>
+              <p className="text-sm text-gray-400 mt-0.5">Accede a los cursos y contenidos de {org.name}</p>
             )}
           </div>
         </div>
@@ -235,15 +235,15 @@ function Store({ orgslug, offers }: StoreProps) {
             <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-4 nice-shadow">
               <ShoppingBag size={28} className="text-gray-300" strokeWidth={1.5} />
             </div>
-            <h2 className="text-xl font-bold text-gray-600 mb-2">No offers available yet</h2>
+            <h2 className="text-xl font-bold text-gray-600 mb-2">No hay ofertas disponibles aún</h2>
             <p className="text-gray-400 text-sm max-w-sm">
-              Check back soon — offers and subscriptions will appear here when they become available.
+              Vuelve pronto — los cursos y suscripciones aparecerán aquí cuando estén disponibles.
             </p>
           </div>
         ) : (
           <>
             <p className="text-sm text-gray-400 mb-5">
-              {offers.length} {offers.length === 1 ? 'offer' : 'offers'} available
+              {offers.length} {offers.length === 1 ? 'curso u oferta disponible' : 'ofertas disponibles'}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {offers.map((offer, index) => (
