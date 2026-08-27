@@ -25,7 +25,7 @@ import ConfirmationModal from '@components/Objects/StyledElements/ConfirmationMo
 import { Button } from '@components/ui/button';
 import { getMainDomainUri } from '@services/config/config';
 import { useLHAnalytics, AnalyticsEvent } from '@services/analytics';
-import { SiStripe } from '@icons-pack/react-simple-icons';
+import { SiStripe, SiMercadopago } from '@icons-pack/react-simple-icons';
 
 // ---------------------------------------------------------------------------
 // Provider registry
@@ -41,6 +41,17 @@ interface PaymentProviderDef {
 }
 
 const PAYMENT_PROVIDERS: PaymentProviderDef[] = [
+  {
+    id: 'mercadopago',
+    name: 'MercadoPago',
+    Icon: SiMercadopago,
+    tagline: 'Acepta pagos locales en Chile (CLP) con tarjetas de débito, crédito y Webpay.',
+    docsUrl: 'https://www.mercadopago.cl/developers',
+    callbackPath: '/payments/mercadopago',
+    async getConnectUrl() {
+      return 'https://www.mercadopago.cl/developers/panel/app';
+    },
+  },
   {
     id: 'stripe',
     name: 'Stripe',
