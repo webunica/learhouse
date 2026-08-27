@@ -136,8 +136,15 @@ class InternalStripeConfig(BaseModel):
     stripe_client_id: str | None
 
 
+class InternalMercadoPagoConfig(BaseModel):
+    access_token: str | None = None
+    public_key: str | None = None
+    webhook_secret: str | None = None
+
+
 class InternalPaymentsConfig(BaseModel):
     stripe: InternalStripeConfig
+    mercadopago: InternalMercadoPagoConfig = InternalMercadoPagoConfig()
 
 
 class LearnHouseConfig(BaseModel):
@@ -581,6 +588,23 @@ def get_learnhouse_config() -> LearnHouseConfig:
         "stripe", {}
     ).get("stripe_client_id")
 
+    # MercadoPago config
+    mp_access_token = (
+        os.environ.get("MERCADOPAGO_ACCESS_TOKEN")
+        or os.environ.get("LEARNHOUSE_MERCADOPAGO_ACCESS_TOKEN")
+        or yaml_config.get("payments_config", {}).get("mercadopago", {}).get("access_token")
+    )
+    mp_public_key = (
+        os.environ.get("MERCADOPAGO_PUBLIC_KEY")
+        or os.environ.get("LEARNHOUSE_MERCADOPAGO_PUBLIC_KEY")
+        or yaml_config.get("payments_config", {}).get("mercadopago", {}).get("public_key")
+    )
+    mp_webhook_secret = (
+        os.environ.get("MERCADOPAGO_WEBHOOK_SECRET")
+        or os.environ.get("LEARNHOUSE_MERCADOPAGO_WEBHOOK_SECRET")
+        or yaml_config.get("payments_config", {}).get("mercadopago", {}).get("webhook_secret")
+    )
+
     # Create HostingConfig and DatabaseConfig objects
     hosting_config = HostingConfig(
         tenancy=tenancy,
@@ -748,8 +772,13 @@ def get_learnhouse_config() -> LearnHouseConfig:
                 stripe_publishable_key=stripe_publishable_key,
                 stripe_webhook_standard_secret=stripe_webhook_standard_secret,
                 stripe_webhook_connect_secret=stripe_webhook_connect_secret,
-                stripe_client_id=stripe_client_id
-            )
+                stripe_client_id=stripe_client_id,
+            ),
+            mercadopago=InternalMercadoPagoConfig(
+                access_token=mp_access_token,
+                public_key=mp_public_key,
+                webhook_secret=mp_webhook_secret,
+            ),
         ),
         tinybird_config=tinybird_config,
         judge0_config=judge0_config,
