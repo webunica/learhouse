@@ -255,7 +255,19 @@ async def serve_local_content(
     await _check_content_access(canonical_rel, current_user, db_session, request=request)
 
     if not os.path.isfile(safe_real):
-        raise HTTPException(status_code=404, detail="File not found")
+        # Fallback search if org_uuid or prefix differs in request
+        filename = os.path.basename(safe_real)
+        matched_file = None
+        for root, _, files in os.walk(base_real):
+            if filename in files:
+                candidate = os.path.join(root, filename)
+                if os.path.isfile(candidate):
+                    matched_file = candidate
+                    break
+        if matched_file:
+            safe_real = matched_file
+        else:
+            raise HTTPException(status_code=404, detail="File not found")
 
     ext = os.path.splitext(safe_real)[1].lower()
     media_type = _MIME_TYPES.get(ext, 'application/octet-stream')
@@ -266,6 +278,8 @@ async def serve_local_content(
         headers={
             "Cache-Control": "public, max-age=86400",
             "X-Content-Type-Options": "nosniff",
+            "Access-Control-Allow-Origin": "*",
+            "Cross-Origin-Resource-Policy": "cross-origin",
         },
     )
 

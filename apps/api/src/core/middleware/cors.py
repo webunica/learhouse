@@ -22,35 +22,27 @@ def _host_from(value: str) -> str:
 
 
 def _single_tenancy_origin_regex(config) -> str:
-    """Build a CORS origin regex pinned to the configured host(s).
-
-    Reflecting any origin back with ``allow_credentials=True`` lets a malicious
-    site make authenticated cross-origin requests (S25). In single mode we
-    therefore only allow the operator's configured frontend/domain host(s)
-    (with or without a ``www.`` prefix, any scheme/port), plus localhost as a
-    fallback so local/dev flows keep working.
-    """
+    """Build a CORS origin regex pinned to the configured host(s) plus Vercel and Railway domains."""
+    import os
     hosts = set()
     for cfg_value in (
+        os.environ.get("LEARNHOUSE_FRONTEND_DOMAIN"),
+        os.environ.get("NEXT_PUBLIC_LEARNHOUSE_MAIN_DOMAIN_NAME"),
         config.hosting_config.frontend_domain,
         config.hosting_config.domain,
     ):
         host = _host_from(cfg_value)
-        # Exclude only the loopback hosts themselves (added separately below).
-        # Use an exact match, not a substring check, so a legitimate operator
-        # domain that merely contains "localhost" (e.g. "my-localhost-app.com")
-        # is not silently dropped — which would break CORS for their frontend.
         if host and host not in ("localhost", "127.0.0.1"):
             hosts.add(host)
 
     if not hosts:
-        return _SINGLE_TENANCY_LOCALHOST_REGEX
+        return r"^https?://(?:localhost|127\.0\.0\.1|.*\.vercel\.app|.*\.up\.railway\.app)(:\d+)?$"
 
     host_alternation = "|".join(
         rf"(?:www\.)?{re.escape(h)}" for h in sorted(hosts)
     )
     return (
-        rf"^https?://(?:{host_alternation}|localhost|127\.0\.0\.1)(:\d+)?$"
+        rf"^https?://(?:{host_alternation}|.*\.vercel\.app|.*\.up\.railway\.app|localhost|127\.0\.0\.1)(:\d+)?$"
     )
 
 

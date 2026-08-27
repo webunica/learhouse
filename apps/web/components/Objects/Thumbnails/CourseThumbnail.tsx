@@ -148,8 +148,9 @@ function CourseThumbnail({ course, orgslug, customLink, isDashboard = false, isS
     }
   }
 
+  const orgUuid = org?.org_uuid || (typeof course.org_id === 'string' ? course.org_id : String(course.org_id || '1'))
   const thumbnailImage = course.thumbnail_image
-    ? getCourseThumbnailMediaDirectory(org?.org_uuid, course.course_uuid, course.thumbnail_image)
+    ? getCourseThumbnailMediaDirectory(orgUuid, course.course_uuid, course.thumbnail_image)
     : '/empty_thumbnail.png'
 
   const courseLink = customLink ? customLink : getUriWithOrg(orgslug, `/course/${removeCoursePrefix(course.course_uuid)}`)
